@@ -1,39 +1,39 @@
-*{
-    padding: 0;
-    margin: 0;
+* {
+  padding: 0;
+  margin: 0;
 }
-ul{
-    list-style: none;
+ul {
+  list-style: none;
 }
-li{
-    border: 1px solid black;
-    background-color: white;
+li {
+  border: 1px solid black;
+  background-color: white;
 }
-aside{
-    display: grid;
-    align-items: center;
-    padding: 50px;
+aside {
+  display: grid;
+  align-items: center;
+  padding: 50px;
 }
-body{
-    display: grid;
-    grid-template-columns: 1fr 3fr;
+body {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
 }
-.playGround{
-    padding: 50px;
+.playGround {
+  padding: 50px;
 }
-.nextBlock{
-    display: grid;
-    grid-template-columns: repeat(4, 40px);
-    grid-template-rows: repeat(4, 40px);
+.nextBlock {
+  display: grid;
+  grid-template-columns: repeat(4, 40px);
+  grid-template-rows: repeat(4, 40px);
 }
-.map{
-    display: grid;
-    grid-template-columns: repeat(10,50px);
-    grid-template-rows: repeat(15, 50px);
+.map {
+  display: grid;
+  grid-template-columns: repeat(10, 50px);
+  grid-template-rows: repeat(15, 50px);
 }
-.gameOver{
-    display: none;
+.gameOver {
+  display: none;
 }
-button{
-    padding: 20px;
+button {
+  padding: 4vw;
 }
