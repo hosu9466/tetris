@@ -34,3 +34,6 @@ body{
 .gameOver{
     display: none;
 }
+button{
+    padding: 20px;
+}
