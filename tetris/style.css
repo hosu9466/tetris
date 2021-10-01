@@ -21,6 +21,9 @@ body {
 .playGround {
   padding: 50px;
 }
+.button{
+    display: flex;
+}
 .nextBlock {
   display: grid;
   grid-template-columns: repeat(4, 40px);
