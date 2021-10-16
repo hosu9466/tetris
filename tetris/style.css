@@ -10,9 +10,12 @@ li {
   background-color: white;
 }
 aside {
+  padding-top: 50px;
+  padding-bottom: 50px;
   display: grid;
   align-items: center;
-  padding: 50px;
+  justify-content: center;
+  text-align: center;
 }
 body {
   display: grid;
@@ -20,9 +23,6 @@ body {
 }
 .playGround {
   padding: 50px;
-}
-.button{
-    display: flex;
 }
 .nextBlock {
   display: grid;
@@ -39,4 +39,10 @@ body {
 }
 button {
   padding: 7%;
+}
+.score {
+  color: black;
+}
+.time{
+  color: black;
 }

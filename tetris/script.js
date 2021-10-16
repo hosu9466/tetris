@@ -1,9 +1,9 @@
-const scoreQuery = document.querySelector(".score");
-const timeQuery = document.querySelector(".time");
-const nextBlockQuery = document.querySelector(".nextBlock");
-const palyGroundQuery = document.querySelector(".palyGround");
-const mapQuery = document.querySelector(".map");
-const gameOverQuery = document.querySelector(".gameOver");
+const scoreDom = document.querySelector(".score");
+const timeDom = document.querySelector(".time");
+const nextBlockDom = document.querySelector(".nextBlock");
+const palyGroundDom = document.querySelector(".palyGround");
+const mapDom = document.querySelector(".map");
+const gameOverDo = document.querySelector(".gameOver");
 const nextBlockSize = 16;
 const mapLowSize = 15;
 const mapColumnSize = 10;
@@ -17,14 +17,29 @@ const blockForms = [
     [[0,1,0],[1,1,1]],
     [[1,1,1,1]],
 ];
-let nextBlockLi = nextBlockQuery.querySelectorAll("li");
-let mapBlockLi = mapQuery.querySelectorAll("li");
+let score = 0;
+let time = 0;
+let nextBlockLi = nextBlockDom.querySelectorAll("li");
+let mapBlockLi = mapDom.querySelectorAll("li");
 let nextBlock;
 let mapBlock;
-let gameOver = false;
-let timeIdentifier;
+var gameOver = false;
+var timeIdentifier;
+
+alert(
+`PC버전
+    방향키로 블록 제어
+    위쪽: 회전, 아래쪽: 가속, 왼쪽: 왼쪽 이동, 오른쪽: 오른쪽 이동
+    스페이스: 아래로 바닥까지 블록 이동
+
+모바일버전(안드로이드 크롬)
+    화면을 기울여 블록 제어
+    앞쪽: 회전, 뒤쪽: 가속, 왼쪽: 왼쪽 이동, 오른쪽: 오른쪽 이동`);
+
 init();
 
+
+//키보드 입력 이벤트 핸들러
 window.onkeydown = (e) => {
     console.log(e);
     if(!mapBlock||gameOver) return;
@@ -39,27 +54,38 @@ window.onkeydown = (e) => {
             moveBlock(1,0);
             break;
         case 40: //down
+            if(!moveBlock(0,1)) makeNextBlock();
+            break;
+        case 32: //space
             dropBlock();
             break;
     }
 }
 
+
+//게임 시작시 초기화
 function init(){
-    while ( nextBlockQuery.hasChildNodes() ) { nextBlockQuery.removeChild( nextBlockQuery.firstChild ); }
-    while ( mapQuery.hasChildNodes() ) { mapQuery.removeChild( mapQuery.firstChild ); }
+    score = 0;
+    scoreDom.innerHTML = `${score} 점`;
+    time = 0;
+    timeDom.innerHTML = `${time} 초`;
+    while ( nextBlockDom.hasChildNodes() ) { nextBlockDom.removeChild( nextBlockDom.firstChild ); }
+    while ( mapDom.hasChildNodes() ) { mapDom.removeChild( mapDom.firstChild ); }
     
     for(let i = 0; i<nextBlockSize; i++){
         let li = document.createElement("li");
-        nextBlockQuery.appendChild(li);
+        nextBlockDom.appendChild(li);
     }
     for(let i = 0; i<mapBlockSize; i++){
         let li = document.createElement("li");
-        mapQuery.appendChild(li);
+        mapDom.appendChild(li);
     }
-    nextBlockLi = nextBlockQuery.querySelectorAll("li");
-    mapBlockLi = mapQuery.querySelectorAll("li");
+    nextBlockLi = nextBlockDom.querySelectorAll("li");
+    mapBlockLi = mapDom.querySelectorAll("li");
 }
 
+
+//랜덤하게 블록을 만든다.
 function makeBlock(){
     return {
         'color' : "#" + Math.round(0x100000 + Math.random() * 0xefffff).toString(16),
@@ -69,6 +95,8 @@ function makeBlock(){
     };
 }
 
+
+//다음 블록에 오는 블록을 새 블록으로 바꾸어 랜더링
 function nextBlockChange(block){
     let index = 0;
     let rowIndex = 0;
@@ -86,6 +114,8 @@ function nextBlockChange(block){
         rowIndex += 1;
     }
 }
+
+//block객체의 정보대로 map에 랜더링
 function blockRenderOnMap(block){
     let index = 0;
     let rowIndex = 0;
@@ -104,6 +134,8 @@ function blockRenderOnMap(block){
     return flag;
 }
 
+
+//map에서 해당 블록을 제거한 후 랜더링
 function removeRenderOnMap(block){
     let index = 0;
     let rowIndex = 0;
@@ -118,6 +150,8 @@ function removeRenderOnMap(block){
         rowIndex += 1;
     }
 }
+
+//block이 map에서 다른 블록이랑 겹치는지 체크. 만약 겹치면 false리턴
 function checkNextPosition(block){
     let index = 0;
     let rowIndex = 0;
@@ -134,14 +168,24 @@ function checkNextPosition(block){
 }
 
 
+function deepCopy(block) { 
+    let result = []; 
+    for (let b of block) result.push(b);
+    return result; 
+}
+
+
+//block을 시계방향으로 회전한 후 랜더링
 function rotateBlock(){
     removeRenderOnMap(mapBlock);
-    console.log(mapBlock['form'] );
+    let preForm = deepCopy(mapBlock['form']);
     mapBlock['form'] = mapBlock['form'][0].map((_, colIndex) => mapBlock['form'].map(row => row[colIndex]).reverse());
-    console.log(mapBlock['form'] );
+    if(!checkNextPosition(mapBlock)) mapBlock['form'] = preForm;
     blockRenderOnMap(mapBlock);
 }
 
+
+//block을 xPos만큼 cloumn을 바꾸고 yPos만큼 row를 바꾸어 랜더링
 function moveBlock(xPos,yPos){
     let prePosition = [mapBlock['xPos'],mapBlock['yPos']];
     let flag = true;
@@ -162,12 +206,15 @@ function moveBlock(xPos,yPos){
     return flag;
 }
 
+
+//block을 바닥까지 내려보낸다.
 function dropBlock(){
     while(moveBlock(0,1)){}
     makeNextBlock();
 }
 
 
+//현재 블록이 더 움직일 여자기 없을 경우 움직일 블록으로 다음 블록을 불러온다.
 function makeNextBlock(){
     if(gameOver) return;
     mapBlock = nextBlock;
@@ -176,12 +223,14 @@ function makeNextBlock(){
     nextBlockChange(nextBlock);
     if(!checkNextPosition(mapBlock)) {
         gameOver = true;
-        gameOverQuery.style.display = "block";
+        gameOverDo.style.display = "block";
         clearTimeout(timeIdentifier);
     }
     else blockRenderOnMap(mapBlock);
 }
 
+
+//map에서 가득찬 row가 있는지 체크하고 있으면 제거한 후 위 블록을 한칸씩 당긴다.
 function checkRowFull(){
     let cnt;
     for(let i=0; i<mapBlockLi.length; i++){
@@ -190,25 +239,28 @@ function checkRowFull(){
             cnt++;
         }
         if(cnt===mapColumnSize){
+            score += mapColumnSize;
             for(let j=i; j>mapColumnSize; j--){
                 mapBlockLi[j].style.backgroundColor=mapBlockLi[j-mapColumnSize].style.backgroundColor
             }
+            scoreDom.innerHTML = score+' 점';
         }
     }
 }
 
+//시작 버튼에 대응하는 함수
 function gameStart(){
     init();
-    gameOverQuery.style.display = "none";
+    gameOverDo.style.display = "none";
     gameOver = false;
     console.log("start");
     nextBlock = makeBlock();
-    console.log(nextBlock);
     nextBlockChange(nextBlock);
     mapBlock = makeBlock();
     setInterval(()=>{
         if(!moveBlock(0,1)) makeNextBlock();
+        time++;
+        timeDom.innerHTML = `${time} 초`;
     },1000);
-    console.log(mapBlock);
-    console.log(blockRenderOnMap(mapBlock));
+    blockRenderOnMap(mapBlock);
 }
